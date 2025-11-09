@@ -1,0 +1,365 @@
+🧠 1. What is Image Rotation?
+
+An image is basically a 2D grid of pixels — think of it as a matrix (rows × columns).
+
+Example:
+Let’s say our image is a 3×3 matrix:
+
+Original image (image):
+1 2 3
+4 5 6
+7 8 9
+
+
+Each number is a pixel value (e.g., grayscale intensity).
+
+We want to rotate it 90° clockwise.
+
+The expected rotated image should be:
+
+Rotated image:
+7 4 1
+8 5 2
+9 6 3
+
+⚙️ 2. Algorithm’s Core Idea
+
+Rotating an image by 90° clockwise means:
+
+The first row of the original becomes the last column of the new image.
+
+The second row becomes the second-to-last column, and so on.
+
+In mathematical terms:
+
+If the original pixel is at position (originalRow, originalCol),
+then its new position after rotation is:
+
+newRow = originalCol
+newCol = imageHeight - 1 - originalRow
+
+
+Let’s decode this formula:
+
+originalCol → becomes the new row (because what used to be horizontal becomes vertical)
+
+imageHeight - 1 - originalRow → becomes the new column (because rows are reversed vertically when rotating)
+
+
+#include <vector>
+using namespace std;
+
+vector<vector<int>> rotateImageBruteForce(const vector<vector<int>>& image) {
+    int imageHeight = image.size();            // Number of rows in the original image
+    int imageWidth = image[0].size();          // Number of columns in the original image
+
+    // Create a new matrix to hold the rotated image.
+    vector<vector<int>> rotatedImage(imageWidth, vector<int>(imageHeight));
+
+    for (int originalRow = 0; originalRow < imageHeight; ++originalRow) {
+        for (int originalCol = 0; originalCol < imageWidth; ++originalCol) {
+            // Calculate the new row and column indices after rotation.
+            int newRow = originalCol;
+            int newCol = imageHeight - 1 - originalRow;
+
+            // Copy the pixel from the original image to the rotated image.
+            rotatedImage[newRow][newCol] = image[originalRow][originalCol];
+        }
+    }
+
+    return rotatedImage;
+}
+
+
+🧮 5. Why These Index Formulas Work
+Let’s break down:
+newRow = originalCol;
+newCol = imageHeight - 1 - originalRow;
+
+Explanation Intuition
+
+
+originalCol → newRow:
+When you rotate 90° clockwise, the columns move “downward” — what used to be the first column becomes the first row.
+
+
+imageHeight - 1 - originalRow → newCol:
+Rows get flipped — what used to be the top becomes the right side, so we reverse the order by subtracting from (height - 1).
+
+
+Think of it like this:
+Top → Right
+Left → Top
+Bottom → Left
+Right → Bottom
+
+This index mapping ensures every pixel lands exactly in the new rotated position.
+
+🧠 6. Memory Details
+
+
+The algorithm creates a new matrix, not rotating in place.
+
+
+Original image remains unchanged.
+
+
+Space complexity = O(N × M) because we’re storing a new copy.
+
+
+If the image is square (N×N):
+
+
+Time complexity: O(N²) → each pixel moved once
+
+
+Space complexity: O(N²) → new matrix of same size
+
+
+
+🧰 7. Summary of Key Operations
+StepDescriptionTimeCreate new matrixAllocate memoryO(N×M)Traverse each pixelDouble loop over rows & colsO(N×M)Compute new positionSimple math (constant time)O(1)Copy pixelOne assignmentO(1)Total:O(N×M)
+
+🎨 8. Visual Mental Model
+Imagine the image like a grid of post-it notes on a wall:
+
+
+Each pixel = one post-it.
+
+
+When you rotate 90° clockwise:
+
+
+The bottom-left post-it moves to the top-left.
+
+
+The top-left post-it moves to the top-right.
+
+
+The middle one (center) stays the same (for odd-size images).
+
+
+
+
+Every single post-it has a calculated new position using the formula above.
+
+🚀 9. In Short (Interview-style Summary)
+Q: How does this algorithm rotate an image?
+A: It builds a new image by placing each pixel from the original image into its new position using index transformation:
+newRow = originalCol
+newCol = height - 1 - originalRow
+
+This effectively performs a 90° clockwise rotation.
+Complexities:
+
+
+Time = O(N×M)
+
+
+Space = O(N×M)
+
+
+Use Case: Easy to implement and safe (doesn’t modify the original), but not optimal for memory.
+
+Would you like me to now show how to rotate the image in-place (without creating a new matrix) — the more optimized and interview-favored version?
+
+
+
+Excellent ✅ — you’re thinking in the right interview direction!
+The in-place image rotation is a very popular LeetCode question:
+
+LeetCode 48. Rotate Image
+https://leetcode.com/problems/rotate-image/
+
+Let’s now go step by step like a real interview, with deep explanation, dry run, reasoning, and code patterns.
+
+🧩 Problem Statement (LeetCode #48 — Rotate Image)
+❓ Question:
+
+You are given an n × n 2D matrix representing an image.
+Rotate the image 90 degrees clockwise, in-place (that means no extra 2D matrix allowed).
+
+👨‍💼 Interviewer–Candidate Dialogue
+
+Interviewer: You just showed a brute force method that creates a new matrix.
+Can you now do this in-place — modify the original matrix directly without using extra space?
+
+Candidate (You): Sure. The key idea is to rotate layers (or rings) of the matrix one by one, or use a two-step transformation trick.
+
+🧠 Step 1: Conceptual Understanding — What is Rotation Doing?
+
+If you visualize a 90° clockwise rotation:
+
+1 2 3
+4 5 6
+7 8 9
+
+
+becomes:
+
+7 4 1
+8 5 2
+9 6 3
+
+
+Notice two patterns:
+
+The rows become columns.
+
+But also, each column is reversed.
+
+That gives us a big insight 👇
+
+💡 Step 2: Key Idea (Two Transformations)
+
+We can rotate the matrix in-place using two simple operations:
+
+Step 1: Transpose the matrix
+
+Turn rows into columns.
+
+Original:
+1 2 3
+4 5 6
+7 8 9
+
+After Transpose:
+1 4 7
+2 5 8
+3 6 9
+
+
+(We swap elements across the main diagonal.)
+
+Step 2: Reverse each row
+After reversing rows:
+7 4 1
+8 5 2
+9 6 3
+
+
+✅ Done! The image is now rotated 90° clockwise — in-place, no extra matrix needed.
+
+🧮 Step 3: Why This Works (Mathematical Intuition)
+
+Transposing turns (row, col) → (col, row)
+Reversing rows mirrors each row horizontally.
+The combined effect = rotate 90° clockwise.
+
+This transformation is equivalent to:
+
+new[i][j] = old[n - 1 - j][i]
+
+
+But done in place with far less complexity.
+
+💻 Step 4: Full Code (C++ – clean, no std::)
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+void rotate(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+
+    // Step 1: Transpose the matrix
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            swap(matrix[i][j], matrix[j][i]);
+        }
+    }
+
+    // Step 2: Reverse each row
+    for (int i = 0; i < n; ++i) {
+        reverse(matrix[i].begin(), matrix[i].end());
+    }
+}
+
+🧩 Step 5: Dry Run Example
+
+Let’s simulate for:
+
+matrix = [
+ [1, 2, 3],
+ [4, 5, 6],
+ [7, 8, 9]
+]
+
+Step 1: Transpose (swap across diagonal)
+i=0,j=1 → swap(2,4)
+i=0,j=2 → swap(3,7)
+i=1,j=2 → swap(6,8)
+
+
+Matrix now:
+
+1 4 7
+2 5 8
+3 6 9
+
+Step 2: Reverse each row
+Row 1 → 7 4 1
+Row 2 → 8 5 2
+Row 3 → 9 6 3
+
+
+✅ Final rotated image:
+
+7 4 1
+8 5 2
+9 6 3
+
+⚙️ Step 6: Complexity Analysis
+Aspect	Explanation	Complexity
+Time	Every element swapped once in transpose + reversed once	O(N²)
+Space	In-place, no new matrix used	O(1)
+🧩 Step 7: Pattern Recognition (Interview Trick)
+
+👉 Whenever you see rotate 90° or clockwise transformation:
+
+Transpose + Reverse rows → 90° clockwise
+
+Transpose + Reverse columns → 90° counterclockwise
+
+Operation	Rotation Direction
+Transpose + Reverse each row	90° clockwise
+Transpose + Reverse each column	90° counterclockwise
+🧠 Step 8: Alternate In-place Layer-by-Layer Rotation (Advanced Variant)
+
+You can also rotate the image by moving 4 cells at a time — one from each side of the current square “layer.”
+
+Code for that version:
+
+void rotate(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+
+    for (int layer = 0; layer < n / 2; ++layer) {
+        int first = layer;
+        int last = n - 1 - layer;
+        for (int i = first; i < last; ++i) {
+            int offset = i - first;
+
+            int top = matrix[first][i]; // save top
+
+            // left → top
+            matrix[first][i] = matrix[last - offset][first];
+
+            // bottom → left
+            matrix[last - offset][first] = matrix[last][last - offset];
+
+            // right → bottom
+            matrix[last][last - offset] = matrix[i][last];
+
+            // top → right
+            matrix[i][last] = top;
+        }
+    }
+}
+
+
+This approach is purely geometric rotation, no transpose or reverse steps — also O(1) space.
+
+🔚 Summary
+Approach	Method	Time	Space	Simplicity
+Brute force	Create new matrix	O(N²)	O(N²)	Easy
+Transpose + Reverse	In-place	O(N²)	O(1)	Clean & Fast ✅
+Layer-by-layer swap	In-place	O(N²)	O(1)	Conceptually harder
