@@ -1,0 +1,201 @@
+Perfect 👌 — this is one of the most famous bit manipulation tricks in programming interviews, known as Brian Kernighan’s Algorithm for counting set bits (i.e., the number of 1s in the binary representation of a number).
+
+We’ll go line by line, explain what’s happening inside the bits, and show why this trick is much faster than the naïve approach.
+
+🧩 Problem: Count the Number of 1s (Set Bits) in a Number
+
+For example:
+
+Input:  13
+Binary: 1101
+Output: 3  (because there are 3 ones)
+
+💻 Code (Given)
+int countSetBits(int number) {
+    int bitCount = 0;
+
+    while (number) {
+        number &= (number - 1);
+        bitCount++;
+    }
+
+    return bitCount;
+}
+
+🧠 Step-by-Step Deep Explanation
+🔹 Line 1:
+int bitCount = 0;
+
+
+We initialize a counter variable to count how many 1s (set bits) we find.
+
+🔹 Line 2:
+while (number) {
+
+
+This means:
+
+Keep looping as long as the number is not zero.
+
+Once number becomes 0, it means there are no set bits left.
+
+🔹 Line 3 (🔥 The Key Line):
+number &= (number - 1);
+
+
+Let’s break this down — this is the heart of the algorithm.
+
+⚙️ What Does number &= (number - 1) Do?
+
+This line:
+
+number = number & (number - 1);
+
+
+removes the rightmost (least significant) set bit (1) from the number.
+
+🔍 Let’s visualize this with an example:
+
+Let’s take:
+
+number = 13
+Binary: 1101
+
+
+Now, let’s calculate (number - 1):
+
+number      = 1101
+(number-1)  = 1100
+
+
+Now perform the bitwise AND:
+
+1101   (13)
+1100   (12)
+---- &
+1100   (12)
+
+
+Result = 1100
+
+✅ Effect: The rightmost set bit (last 1) has been cleared.
+
+Now again, next iteration:
+
+number = 1100
+(number - 1) = 1011
+AND result = 1000
+
+
+✅ The next rightmost 1 cleared.
+
+Next iteration:
+
+number = 1000
+(number - 1) = 0111
+AND result = 0000
+
+
+✅ Now all bits cleared → loop stops.
+
+🔹 Line 4:
+bitCount++;
+
+
+Every time we clear one bit, we increase the count by one, because we’ve found (and removed) one set bit.
+
+🔹 Line 5:
+return bitCount;
+
+
+After all bits are cleared, bitCount stores how many set bits were found.
+
+🧮 Dry Run Example: number = 13
+Step	number (binary)	number-1 (binary)	AND Result	bitCount
+1	1101	1100	1100	1
+2	1100	1011	1000	2
+3	1000	0111	0000	3
+
+Loop stops (number = 0)
+✅ Final bitCount = 3.
+
+🔥 Why Is This Faster Than Normal Bit Checking?
+Naïve method:
+
+Check every bit:
+
+while (number > 0) {
+    if (number & 1)
+        bitCount++;
+    number >>= 1;
+}
+
+
+This checks all bits, even if they’re 0 → O(total bits) (≈ 32 iterations for 32-bit int).
+
+Brian Kernighan’s method:
+
+Loops only for the number of 1s →
+O(number of set bits) ⏩ Much faster for sparse numbers.
+
+For example:
+
+number = 8 (binary 1000) → only 1 iteration.
+
+number = 1,073,741,824 (2³⁰) → only 1 iteration.
+
+number = 15 (1111) → 4 iterations.
+
+🧠 Logic Summary
+
+Each iteration:
+
+Removes one set bit.
+
+Increments the counter.
+
+Mathematically, for k set bits in n,
+the loop runs exactly k times.
+
+Formula logic:
+
+n = n & (n - 1)
+⟹ removes lowest set bit
+
+🧩 Example Visualization
+
+Let’s visualize with n = 22 (10110):
+
+Iteration	Binary (before)	Binary (after n & (n-1))	bitCount
+1	10110	10100	1
+2	10100	10000	2
+3	10000	00000	3
+
+✅ Final result: bitCount = 3
+
+⏱️ Complexity
+Type	Complexity
+Time	O(k), where k = number of set bits
+Space	O(1)
+🧩 Pattern Recognition (Interview Tip)
+
+This trick (n & (n-1)) appears in many bit manipulation problems, such as:
+
+Checking power of two:
+if (n && !(n & (n - 1))) → true if only one bit is set.
+
+Counting set bits (current one).
+
+Removing last set bit in bitmask DP problems.
+
+So, whenever you see bit clearing or “power of two” checks, this pattern is likely involved.
+
+✅ Final Code (clean)
+int countSetBits(int number) {
+    int bitCount = 0;
+    while (number) {
+        number &= (number - 1); // clear the rightmost 1
+        bitCount++;
+    }
+    return bitCount;
+}
